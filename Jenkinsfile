@@ -2,16 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'dockerhub_username/jenapp'
+        DOCKER_IMAGE = 'rafikikamanzi/jenapp'
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
     }
 
     stages {
-
         stage('Checkout') {
-            steps {
-                checkout scm
-            }
+            steps { checkout scm }
         }
 
         stage('Build') {
@@ -22,9 +19,7 @@ pipeline {
         }
 
         stage('Test') {
-            steps {
-                echo "Running tests..."
-            }
+            steps { echo "Running tests..." }
         }
 
         stage('Build Docker Image') {
@@ -55,6 +50,5 @@ pipeline {
                 }
             }
         }
-
     }
 }
