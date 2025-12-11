@@ -45,7 +45,7 @@ pipeline {
                 script {
                     bat """
                     docker rm -f jenapp || true
-                    docker run -d --name jenapp -p 8080:80 ${DOCKER_IMAGE}:latest
+                    docker run -d --name jenapp -p 8081:80 ${DOCKER_IMAGE}:latest
                     """
                 }
             }
