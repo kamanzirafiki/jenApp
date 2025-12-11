@@ -1,12 +1,23 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'dockerhub_username/jenapp'
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+    }
+
     stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
         stage('Build') {
             steps {
-                echo "Building the project..."
-                bat 'dir'     // Windows command
+                echo "Building project..."
+                bat 'dir'
             }
         }
 
@@ -16,11 +27,34 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Build Docker Image') {
             steps {
-                echo "Deploying..."
+                script {
+                    dockerImage = docker.build("${DOCKER_IMAGE}:latest")
+                }
             }
         }
 
-    }   // closes stages block
-}       // closes pipeline block
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Local Docker Host') {
+            steps {
+                script {
+                    bat """
+                    docker rm -f jenapp || true
+                    docker run -d --name jenapp -p 8080:80 ${DOCKER_IMAGE}:latest
+                    """
+                }
+            }
+        }
+
+    }
+}
